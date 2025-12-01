@@ -10,7 +10,7 @@ message("---Day: ${Day}---")
 project("project")
 
 if(${Day} EQUAL 1) 
-	add_executable("day_1.out" src/day_1.cpp)
+	add_executable("day1.out" src/day1.cpp)
 else()
 	message("ERROR: Invalid day")
 endif()
