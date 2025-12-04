@@ -53,6 +53,7 @@ int part2(std::vector<std::vector<bool>> map) {
 		removed = 0;
 		for (int row = 0; row < map.size(); ++row) {
 			for (int col = 0; col < map[0].size(); ++col) {
+				if(!map[row][col]) continue;
 				int count = count_surrounding(row, col, map);
 				if (count < 4){
 					map[row][col] = false;
