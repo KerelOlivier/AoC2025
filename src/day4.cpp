@@ -45,7 +45,26 @@ int part1(std::vector<std::vector<bool>> &map) {
 
   return res;
 }
-int part2(std::vector<std::vector<bool>> map) { return 2; }
+int part2(std::vector<std::vector<bool>> map) {
+	int res = 0;
+	int removed = 0;
+
+	do{
+		removed = 0;
+		for (int row = 0; row < map.size(); ++row) {
+			for (int col = 0; col < map[0].size(); ++col) {
+				int count = count_surrounding(row, col, map);
+				if (count < 4){
+					map[row][col] = false;
+					++removed;
+					++res;
+				}
+			}
+		}
+	}while(removed > 0);
+
+  return res;
+}
 
 int main(int argc, char **argv) {
   std::vector<std::vector<bool>> map;
