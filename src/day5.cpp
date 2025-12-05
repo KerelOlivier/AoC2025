@@ -1,26 +1,63 @@
+#include <algorithm>
 #include <fstream>
 #include <interval_tree.h>
 #include <iostream>
 #include <string>
+#include <unordered_set>
 #include <vector>
 
-int part1(std::vector<ds::Interval<unsigned long int>> intervals,
+int part1(const std::vector<ds::Interval<unsigned long int>> &intervals,
           std::vector<unsigned long int> items) {
 
-	int res = 0;
+  int res = 0;
   for (const auto &item : items) {
     for (const auto &interval : intervals) {
-      if(item >= interval.lower && item <= interval.upper){
-				++res;
-				break;
-			}
+      if (item >= interval.lower && item <= interval.upper) {
+        ++res;
+        break;
+      }
     }
   }
 
   return res;
 }
 
-int part2() { return 1; }
+unsigned long int part2(std::vector<ds::Interval<unsigned long int>> intervals) {
+  // Sort by starting id
+  struct{
+    bool operator()(ds::Interval<unsigned long int> a,
+                    ds::Interval<unsigned long int> b) const {
+			if(a.lower != b.lower) return a.lower < b.lower;
+			else return a.upper < b.upper;
+    }
+  } comparator;
+
+  std::sort(intervals.begin(), intervals.end(), comparator);
+
+	unsigned long int res = 0;
+
+	unsigned long int bound = 0;
+
+	for(const auto& interval:intervals){
+
+		if(interval.upper <= bound) continue; // interval is contained already
+		
+		
+		unsigned long int vals = interval.upper - interval.lower + 1;
+
+
+		if(interval.lower <= bound){
+			// Remove the already processed values from return
+			vals -= bound - interval.lower + 1;
+
+		}
+
+		res += vals;
+		bound = interval.upper;
+	}
+
+  return res;
+}
 
 int main(int argc, char **argv) {
   std::ifstream stream(argv[1]);
@@ -44,4 +81,5 @@ int main(int argc, char **argv) {
   }
 
   std::cout << "Part 1: " << part1(intervals, items) << std::endl;
+  std::cout << "Part 2: " << part2(intervals) << std::endl;
 }
