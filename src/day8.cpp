@@ -109,6 +109,69 @@ unsigned long int part1(std::vector<Junction> &junctions,
   return a * b * c;
 }
 
+
+unsigned long int part2(std::vector<Junction> &junctions,
+                        std::vector<Connection> &edges,
+                        unsigned long int connections) {
+  struct edge_comp {
+    inline bool operator()(const Connection &e1, const Connection &e2) {
+      return (e1.length < e2.length);
+    }
+  };
+
+  // Sort the edges by length;
+  std::sort(edges.begin(), edges.end(), edge_comp());
+
+  // Create the graph
+  std::unordered_map<unsigned long int, unsigned long int> labels;
+  std::unordered_map<unsigned long int, unsigned long int> label_count;
+
+  long unsigned int counter = 0;
+  long unsigned int label_counter = 0;
+	long unsigned int res = 0;
+  for(size_t i= 0; i < edges.size(); ++i) {
+    Connection &e = edges[i];
+
+    if (!labels.contains(e.src))
+      labels[e.src] = label_counter++;
+    if (!labels.contains(e.trg))
+      labels[e.trg] = label_counter++;
+
+    // Check if already in the same circuit, if so skip them
+    if (labels[e.src] == labels[e.trg]) {
+      ++counter;
+      continue;
+    }
+
+    // Determine new label
+    unsigned long int new_label = std::min(labels[e.src], labels[e.trg]);
+    unsigned long int old_label = std::max(labels[e.src], labels[e.trg]);
+	
+		res = junctions[e.src].x * junctions[e.trg].x;
+
+    // Set labels
+    for (auto &pair : labels) {
+      if (pair.second == old_label)
+        pair.second = new_label;
+    }
+
+    if (!label_count.contains(new_label))
+      label_count[new_label] = 1;
+    if (!label_count.contains(old_label))
+      label_count[old_label] = 1;
+
+    label_count[new_label] += label_count[old_label];
+    label_count.erase(old_label);
+
+    ++counter;
+  }
+
+
+
+  return res;
+}
+
+
 int main(int argc, char **argv) {
   std::ifstream stream(argv[1]);
   std::string line;
@@ -138,4 +201,5 @@ int main(int argc, char **argv) {
   }
 
   std::cout << "Part 1: " << part1(junctions, edges, connections) << std::endl;
+  std::cout << "Part 2: " << part2(junctions, edges, connections) << std::endl;
 }
