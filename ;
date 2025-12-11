@@ -1,0 +1,95 @@
+#include <fstream>
+#include <iostream>
+#include <stack>
+#include <string>
+#include <unordered_map>
+#include <vector>
+#include <cmath>
+
+#define progress std::pair<unsigned int, unsigned long int>
+
+struct Config {
+  unsigned int lights;
+	char light_count;
+  std::vector<unsigned int> buttons;
+  std::vector<unsigned int> battery;
+};
+
+unsigned long int getMinPresses(const Config &config) {
+
+  std::unordered_map<unsigned int, unsigned long int> mem;
+  std::stack<progress> dfs;
+	
+	unsigned int on = (1 << config.light_count)-1;
+
+	// First state to the stack
+	dfs.emplace(config.lights, 0);
+
+	while(!dfs.empty()){
+		progress curr = dfs.top();
+		dfs.pop();
+		if(mem.contains(curr.first)){
+			mem[curr.first] = std::min(curr.second, mem[curr.first]);
+		}else{
+			for(const auto& button : config.buttons){
+				dfs.emplace()
+			}
+		}
+
+	}
+
+	
+  return mem[on];
+}
+
+unsigned long int part1(std::vector<Config> &configs) {
+  unsigned long int res = 0;
+
+  for (const auto &config : configs) {
+    res += getMinPresses(config);
+  }
+
+  return res;
+}
+
+int main(int argc, char **argv) {
+  std::vector<Config> input;
+  std::ifstream stream(argv[1]);
+  std::string line;
+
+  Config curr;
+
+  unsigned int max_val = 0;
+
+  while (stream >> line) {
+    if (line[0] == '[') {
+			curr.light_count = line.length()-2;
+      unsigned int lights = 0;
+      for (int i = 1; i < line.length() - 1; ++i) {
+        lights <<= 1;
+        lights += line[i] == '#';
+      }
+      curr.lights = lights;
+    } else if (line[0] == '(') {
+      unsigned int button = 0;
+
+			if(line.length()-1 > max_val) max_val = line.length() - 1; 
+      while (line.length() > 0) {
+        unsigned int next = line.find(',');
+
+        if (next > line.length()) {
+          button |= 1 << std::stoi(line.substr(0, line.length() - 1));
+          line = "";
+        } else {
+          button |= 1 << std::stoi(line.substr(0, next));
+          line = line.substr(next + 1);
+        }
+      }
+
+      curr.buttons.push_back(button);
+    } else {
+    }
+  }
+
+  std::cout << "Part 1: " << part1(input) << std::endl;
+}
